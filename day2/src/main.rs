@@ -74,7 +74,7 @@ fn main() {
 
     println!("Part 1 result: {}", machine.execute());
 
-    for noun in 0..99 {
+    'noun: for noun in 0..99 {
         for verb in 0..99 {
             let mut machine = IntMachine::from_file("input.txt");
             machine.mem.insert(1, noun);
@@ -82,6 +82,7 @@ fn main() {
 
             if machine.execute() == 19690720 {
                 println!("Part 2 result: noun {}, verb {}", noun, verb);
+                break 'noun;
             }
         }
     }
