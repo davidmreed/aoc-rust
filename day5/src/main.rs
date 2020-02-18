@@ -102,8 +102,9 @@ impl IntMachine {
     fn execute(&mut self) -> i32 {
         loop {
             let op = self.get_direct(self.ip);
+            let op_value = get_opcode_value(op);
 
-            match get_opcode_value(op) {
+            match op_value {
                 1 => {
                     self.mem.insert(
                         self.get_target(op, Parameter::TARGET),
@@ -134,7 +135,28 @@ impl IntMachine {
                         self.get(op, Parameter::LEFT)
                     );
                     self.ip += 2;
-                }
+                },
+                5 | 6 => {
+                    if (self.get(op, Parameter::LEFT) == 0) == (op_value == 6) {
+                        self.ip = self.get(op, Parameter::RIGHT);
+                    } else {
+                        self.ip += 3;
+                    }
+                },
+                7 => {
+                    self.mem.insert(
+                        self.get_target(op, Parameter::TARGET),
+                        if self.get(op, Parameter::LEFT) < self.get(op, Parameter::RIGHT) { 1 } else { 0 }
+                    );
+                    self.ip += 4;
+                },
+                8 => {
+                    self.mem.insert(
+                        self.get_target(op, Parameter::TARGET),
+                        if self.get(op, Parameter::LEFT) == self.get(op, Parameter::RIGHT) { 1 } else { 0 }
+                    );
+                    self.ip += 4;
+                },
                 99 => return self.get_direct(0), 
                 _ => panic!(format!("Invalid opcode {}", op)),
             }
